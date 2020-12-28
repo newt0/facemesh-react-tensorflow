@@ -5,8 +5,17 @@ import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/facemesh";
 
 function App() {
+  // setup references
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
+
+  // load facemesh
+  const runFacemesh = async () => {
+    const net = await facemesh.load({
+      inputResolution: { width: 640, height: 480 },
+      scale: 0.8,
+    });
+  };
   return (
     <div className="app">
       <div className="app_header">
