@@ -1,8 +1,9 @@
-import { React, useRef } from "react";
+import { React, useRef, useEffect } from "react";
 import "./App.css";
 import Webcam from "react-webcam";
 import * as tf from "@tensorflow/tfjs";
 import * as facemesh from "@tensorflow-models/facemesh";
+import { drawMesh } from "./utilities";
 
 function App() {
   // setup references
@@ -15,9 +16,10 @@ function App() {
       inputResolution: { width: 640, height: 480 },
       scale: 0.8,
     });
+
     setInterval(() => {
       detect(net);
-    }, [100]); // run detect function every 100 milliseconds
+    }, [10]); // run detect function every 100 milliseconds
   };
 
   // detect function
@@ -30,8 +32,8 @@ function App() {
     ) {
       // get video properties
       const video = webcamRef.current.video;
-      const videoWidth = webcamRef.current.videoWidth;
-      const videoHeight = webcamRef.current.videoHeight;
+      const videoWidth = webcamRef.current.video.videoWidth; // !typo!
+      const videoHeight = webcamRef.current.video.videoHeight;
 
       // set video width
       webcamRef.current.video.width = videoWidth;
@@ -43,13 +45,17 @@ function App() {
 
       // make detections
       const face = await net.estimateFaces(video);
-      console.log(face);
+      // console.log(face);
 
       // get canvas context for drawing
+      const ctx = canvasRef.current.getContext("2d");
+      drawMesh(face, ctx);
     }
   };
 
-  runFacemesh();
+  useEffect(() => {
+    runFacemesh();
+  }, []);
 
   return (
     <div className="app">
